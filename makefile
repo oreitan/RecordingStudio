@@ -3,4 +3,4 @@ CPPFLAGS = -I "$(MYSQL_CONCPP_DIR)/include" -L "$(MYSQL_CONCPP_DIR)/lib64" -L "$
 LDLIBS = -lmysqlcppconn8
 CXX = clang++ -stdlib=libc++
 
-main : main.cpp db.cpp
+main : main.cpp db.cpp instrument.cpp producer.cpp song.cpp album.cpp 
