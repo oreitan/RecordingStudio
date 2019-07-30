@@ -56,6 +56,14 @@ int get_max(std::vector<int> &vector)
 
   return index;
 }
+template <typename T>
+void vector_Free(std::vector<T*> vec)
+{
+  for (int i ;i<vec.size();i++)
+  {
+    delete vec[i];
+  }
+}
 
 int init()
 {
@@ -440,7 +448,7 @@ int q1(std::string start_date, std::string end_date)
   if ((row = mysqlx_row_fetch_one(result)) != NULL)
   {
     mysqlx_get_sint(row, 0, &x);
-    std::cout << "The number of albums in between the two dates are" << x << std::endl;
+    std::cout << "The number of albums in between the two dates are: " << x << std::endl;
   }
   else
   {
@@ -530,6 +538,7 @@ int q2(std::string name, std::string start_date, std::string end_date)
 
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(performers);
 
   return 0;
 }
@@ -612,6 +621,7 @@ int q3(std::string name, std::string start_date, std::string end_date)
 
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(performers);
   return 0;
 }
 
@@ -679,6 +689,7 @@ int q4()
 
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(instruments);
   return 0;
 }
 
@@ -739,6 +750,8 @@ int q5(std::string name)
 
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(album);
+  vector_Free(instruments);
 
   return 0;
 }
@@ -806,6 +819,7 @@ int q6(std::string start_Date, std::string end_Date)
 
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(producers);
   return 0;
 }
 
@@ -876,6 +890,7 @@ int q7()
 
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(instruments);
 
   return 0;
 }
@@ -1017,10 +1032,13 @@ int q9()
 
     std::vector<Performer *> performers = initPerformers(result);
     std::cout << "the performer who collabed the most : " << performers[0]->getName() << std::endl;
+    vector_Free(performers);
   }
 
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(songs);
+
 
   return 0;
 }
@@ -1072,6 +1090,7 @@ int q10()
 
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(songs);
 
   return 0;
 }
@@ -1124,6 +1143,7 @@ int q11(std::string start_Date, std::string end_Date)
 
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(songs);
 
   return 0;
 }
@@ -1161,6 +1181,7 @@ int q12()
 
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(albums);
 
   return 0;
 }
@@ -1233,6 +1254,8 @@ int q13()
   }
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(songs);
+  vector_Free(choosen);
 
   return 0;
 }
@@ -1335,6 +1358,9 @@ int q14()
 
   mysqlx_free(result);
   mysqlx_session_close(session);
+  vector_Free(a);
+  vector_Free(songs);
+  
 
   return 0;
 }
@@ -1401,6 +1427,7 @@ int q15()
     std::cout << "The Preformer with the most diverse musical genres is :" << performers[index]->getName() << std::endl;
 
   mysqlx_session_close(session);
-
+  mysqlx_free(result);
+  vector_Free(performers);
   return 0;
 }
