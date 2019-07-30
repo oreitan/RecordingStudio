@@ -448,7 +448,7 @@ int q1(std::string start_date, std::string end_date)
   if ((row = mysqlx_row_fetch_one(result)) != NULL)
   {
     mysqlx_get_sint(row, 0, &x);
-    std::cout << "The number of albums in between the two dates are: " << x << std::endl;
+    std::cout << "The number of albums in between the two dates are: "<< x << std::endl;
   }
   else
   {
