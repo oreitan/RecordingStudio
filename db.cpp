@@ -97,7 +97,7 @@ int init()
     return -1;
   }
 
-  query = mysqlx_sql_new(session, "CREATE TABLE `Musician` (\
+  query = mysqlx_sql_new(session, "CREATE TABLE `Preformer` (\
  `ID_Musician` INT NOT NULL,\
  `Name` VARCHAR(256) NOT NULL,\
  `Skill` VARCHAR(256) NOT NULL,\
@@ -119,7 +119,7 @@ int init()
   if ((result = mysqlx_execute(query)) == NULL)
     return -1;
 
-  query = mysqlx_sql_new(session, "CREATE TABLE `Tracks` (\
+  query = mysqlx_sql_new(session, "CREATE TABLE `Songs` (\
  `T_ID` INT NOT NULL,\
  `Name` VARCHAR(256) NOT NULL,\
  `Music_Comp` VARCHAR(256) NULL,\
@@ -139,7 +139,7 @@ int init()
  `Name` VARCHAR(256) NOT NULL,\
  `Start_Date` VARCHAR(256) NOT NULL,\
  `End_Date` VARCHAR(256) NOT NULL,\
- `Tracks_Amount` INT NOT NULL,\
+ `Songs_Amount` INT NOT NULL,\
  PRIMARY KEY (`A_ID`));",
                          MYSQLX_NULL_TERMINATED);
 
@@ -157,14 +157,14 @@ int init()
 
   // Relations tables
 
-  query = mysqlx_sql_new(session, "CREATE TABLE `Musician_Inst` (\
+  query = mysqlx_sql_new(session, "CREATE TABLE `Preformer_Inst` (\
  `M_ID` INT NOT NULL,\
  `I_ID` INT NOT NULL,\
  PRIMARY KEY (`I_ID`, `M_ID`),\
  INDEX `MI_mID_idx` (`M_ID` ASC) VISIBLE,\
  CONSTRAINT `MI_mID`\
  FOREIGN KEY (`M_ID`)\
- REFERENCES `Musician` (`ID_Musician`)\
+ REFERENCES `Preformer` (`ID_Musician`)\
  ON DELETE NO ACTION\
  ON UPDATE NO ACTION,\
  CONSTRAINT `MI_iID`\
@@ -177,19 +177,19 @@ int init()
   if ((result = mysqlx_execute(query)) == NULL)
     return -1;
 
-  query = mysqlx_sql_new(session, "CREATE TABLE `Musician_Tracks` (\
+  query = mysqlx_sql_new(session, "CREATE TABLE `Preformer_Songs` (\
  `M_ID` INT NOT NULL,\
  `T_ID` INT NOT NULL,\
  PRIMARY KEY (`M_ID`, `T_ID`),\
  INDEX `MT_tID_idx` (`t_ID` ASC) VISIBLE,\
  CONSTRAINT `MT_mID`\
  FOREIGN KEY (`M_ID`)\
- REFERENCES `Musician` (`ID_Musician`)\
+ REFERENCES `Preformer` (`ID_Musician`)\
  ON DELETE NO ACTION\
  ON UPDATE NO ACTION,\
  CONSTRAINT `MT_tID`\
  FOREIGN KEY (`T_ID`)\
- REFERENCES `Tracks` (`T_ID`)\
+ REFERENCES `Songs` (`T_ID`)\
  ON DELETE NO ACTION\
  ON UPDATE NO ACTION);",
                          MYSQLX_NULL_TERMINATED);
@@ -197,14 +197,14 @@ int init()
   if ((result = mysqlx_execute(query)) == NULL)
     return -1;
 
-  query = mysqlx_sql_new(session, "CREATE TABLE `Album_Tracks` (\
+  query = mysqlx_sql_new(session, "CREATE TABLE `Album_Songs` (\
  `T_ID` INT NOT NULL,\
  `A_ID` INT NOT NULL,\
  PRIMARY KEY (`T_ID`, `A_ID`),\
  INDEX `AT_aID_idx` (`A_ID` ASC) VISIBLE,\
  CONSTRAINT `AT_tID`\
  FOREIGN KEY (`T_ID`)\
- REFERENCES `Tracks` (`T_ID`)\
+ REFERENCES `Songs` (`T_ID`)\
  ON DELETE NO ACTION\
  ON UPDATE NO ACTION,\
  CONSTRAINT `AT_aID`\
@@ -240,7 +240,7 @@ int init()
 #pragma endregion
 
 #pragma region insert
-  query = mysqlx_sql_new(session, "INSERT INTO `Musician` (`ID_musician`, `Name`, `Skill`, `Phone`, `Address`) VALUES\
+  query = mysqlx_sql_new(session, "INSERT INTO `Preformer` (`ID_musician`, `Name`, `Skill`, `Phone`, `Address`) VALUES\
  (1, 'Marshmello', '1', '1-111-234', 'US'),\
  (2, 'Blink-182', '2', '1-234-652', 'US'),\
  (3, 'Pixies', '2', '1-432-566', 'US'),\
@@ -250,13 +250,15 @@ int init()
  (7, 'Bastille', '2', '44-234-743', 'UK'),\
  (8, 'ODESZA', '1', '1-532-754', 'US'),\
  (9, 'WYNNE', '0', '1-643-830', 'US'),\
- (10, 'Mansionair', '0', 'H', 'AU');",
+ (10, 'Mansionair', '0', '61-321-964', 'AU'),\
+ (11, 'Dan Smith', '0', '44-234-743', 'UK'),\
+ (12, 'Madonna', '0', '61-593-9532', 'AU');",
                          MYSQLX_NULL_TERMINATED);
 
   if ((result = mysqlx_execute(query)) == NULL)
     return -1;
 
-  query = mysqlx_sql_new(session, "INSERT INTO `Tracks` (`T_ID`, `Name`, `Music_Comp`, `Lyrics_Comp`, `Length`, `Date`, `Genre`, `Tech`) VALUES\
+  query = mysqlx_sql_new(session, "INSERT INTO `Songs` (`T_ID`, `Name`, `Music_Comp`, `Lyrics_Comp`, `Length`, `Date`, `Genre`, `Tech`) VALUES\
  (1, 'Summer', 'Marshmello', 'NULL', 171, '2017-01-09', 'Electonic', 'Daniel Malikier'),\
  (2, 'Happier', 'Marshmello', 'Dan Smith', 223, '2018-09-24', 'Electronic', 'Mercedes Bryce Morgan'),\
  (3, 'Dammit', 'Mark Hoppus', 'Tom DeLonge', 165, '1997-09-23', 'Rock', 'Mark Trombino'),\
@@ -272,7 +274,7 @@ int init()
   if ((result = mysqlx_execute(query)) == NULL)
     return -1;
 
-  query = mysqlx_sql_new(session, "INSERT INTO `albums` (`A_ID`, `Name`, `Start_Date`, `End_Date`, `Tracks_Amount`) VALUES\
+  query = mysqlx_sql_new(session, "INSERT INTO `albums` (`A_ID`, `Name`, `Start_Date`, `End_Date`, `Songs_Amount`) VALUES\
  (1, 'Joytime', '2017-01-08', '2018-09-25', 2),\
  (2, 'Happier', '2018-09-24', '2018-09-25', 1),\
  (3, 'Buddha', '1997-09-22', '1997-09-23', 1),\
@@ -282,7 +284,8 @@ int init()
  (7, 'Loyal', '2017-09-07', '2017-09-08', 1),\
  (8, 'Pompeii', '2012-12-10', '2012-12-12', 1),\
  (9, 'VS', '2018-01-07', '2018-01-09', 2),\
- (10, 'Vogue', '1990-03-25', '1990-03-27', 1);",
+ (10, 'Vogue', '1990-03-25', '1990-03-27', 1),\
+ (11, 'Joytime II', '2019-01-08', '2019-09-25', 1);",
                          MYSQLX_NULL_TERMINATED);
 
   if ((result = mysqlx_execute(query)) == NULL)
@@ -320,7 +323,7 @@ int init()
   if ((result = mysqlx_execute(query)) == NULL)
     return -1;
 
-  query = mysqlx_sql_new(session, "INSERT INTO `musician_inst` (`M_ID`, `I_ID`) VALUES\
+  query = mysqlx_sql_new(session, "INSERT INTO `Preformer_inst` (`M_ID`, `I_ID`) VALUES\
  (1,1),\
  (1,8),\
  (2,4),\
@@ -343,7 +346,7 @@ int init()
   if ((result = mysqlx_execute(query)) == NULL)
     return -1;
 
-  query = mysqlx_sql_new(session, "INSERT INTO `musician_tracks` (`M_ID`, `T_ID`) VALUES\
+  query = mysqlx_sql_new(session, "INSERT INTO `Preformer_Songs` (`M_ID`, `T_ID`) VALUES\
  (1,1),\
  (1,2),\
  (7,2),\
@@ -364,7 +367,7 @@ int init()
   if ((result = mysqlx_execute(query)) == NULL)
     return -1;
 
-  query = mysqlx_sql_new(session, "INSERT INTO `album_tracks`(`T_ID`, `A_ID`) VALUES\
+  query = mysqlx_sql_new(session, "INSERT INTO `album_Songs`(`T_ID`, `A_ID`) VALUES\
  (1,1),\
  (2,1),\
  (2,2),\
@@ -378,7 +381,8 @@ int init()
  (9,8),\
  (2,9),\
  (9,9),\
- (10,10);",
+ (10,10),\
+ (1,11);",
                          MYSQLX_NULL_TERMINATED);
 
   if ((result = mysqlx_execute(query)) == NULL)
@@ -462,7 +466,7 @@ int q2(std::string name, std::string start_date, std::string end_date)
   mysqlx_stmt_t *query;
   mysqlx_result_t *result;
 
-  std::string str_query = "select * from musician where Name Like '%" + name + "%';\0";
+  std::string str_query = "select * from Preformer where Name Like '%" + name + "%';\0";
   query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
   if ((result = mysqlx_execute(query)) == NULL)
@@ -499,7 +503,7 @@ int q2(std::string name, std::string start_date, std::string end_date)
     } while (choice < 1 || choice > performers.size());
   }
 
-  str_query = "select count(*) from tracks as t join musician_tracks as m on \
+  str_query = "select count(*) from Songs as t join Preformer_Songs as m on \
  m.T_ID = t.T_ID where M_ID = " +
               std::to_string(performers[choice - 1]->getID()) + " and t.Date > '" + start_date + "' and t.Date < '" + end_date + "';\0";
 
@@ -545,7 +549,7 @@ int q3(std::string name, std::string start_date, std::string end_date)
   mysqlx_row_t *row;
   int64_t x;
 
-  std::string str_query = "select * from musician where Name Like '%" + name + "%';\0";
+  std::string str_query = "select * from Preformer where Name Like '%" + name + "%';\0";
   query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
   if ((result = mysqlx_execute(query)) == NULL)
@@ -582,8 +586,8 @@ int q3(std::string name, std::string start_date, std::string end_date)
     } while (choice < 1 || choice > performers.size());
   }
 
-  str_query = "select count(*) from albums as ab join (select A_ID from( (select * from Album_tracks) as a INNER JOIN\
- (select * from Musician_tracks where Musician_tracks.M_ID = " +
+  str_query = "select count(*) from albums as ab join (select A_ID from( (select * from Album_Songs) as a INNER JOIN\
+ (select * from Preformer_Songs where Preformer_Songs.M_ID = " +
               std::to_string(performers[choice - 1]->getID()) + ") as b\
  on a.T_ID = b.T_ID) group by A_ID ) as c on ab.A_id = c.A_ID where End_Date > '" +
               start_date + "' and End_Date < '" + end_date + "' ;\0";
@@ -643,8 +647,8 @@ int q4()
   for (int i = 0; i < instruments.size(); ++i)
   {
     str_query = "SELECT count(*) from (\
- (SELECT * FROM musician_Inst where I_ID = " +
-                std::to_string(instruments[i]->getID()) + " ) as a join musician_Tracks as b \
+ (SELECT * FROM Preformer_Inst where I_ID = " +
+                std::to_string(instruments[i]->getID()) + " ) as a join Preformer_Songs as b \
  on a.M_ID = b.M_ID );";
 
     std::cout << str_query << std::endl;
@@ -709,8 +713,8 @@ int q5(std::string name)
   }
 
   str_query = "select * from Inst as i join\
- (select I_ID from Musician_Inst as mi join\
- (select M_ID from Album_Tracks as a  join Musician_Tracks as b on a.T_ID = b.T_ID where a.A_ID = " +
+ (select I_ID from Preformer_Inst as mi join\
+ (select M_ID from Album_Songs as a  join Preformer_Songs as b on a.T_ID = b.T_ID where a.A_ID = " +
               std::to_string(album[0]->getID()) + ")\
  as mb on mi.M_ID = mb.M_ID) as b on i.I_ID = b.I_ID ;\0";
 
@@ -837,8 +841,8 @@ int q7()
   for (int i = 0; i < instruments.size(); ++i)
   {
     str_query = "SELECT count(*) from (\
- (SELECT * FROM musician_inst where I_ID = " +
-                std::to_string(instruments[i]->getID()) + ") as a join musician_tracks as b\
+ (SELECT * FROM Preformer_inst where I_ID = " +
+                std::to_string(instruments[i]->getID()) + ") as a join Preformer_Songs as b\
  on a.M_ID = b.M_ID);";
 
     query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
@@ -889,7 +893,7 @@ int q8()
   mysqlx_stmt_t *query;
   mysqlx_result_t *result;
 
-  std::string str_query = "SELECT COUNT(*) FROM (SELECT * FROM musician  JOIN musician_tracks ON id_musician = M_ID group by M_ID) AS b;\0";
+  std::string str_query = "SELECT COUNT(*) FROM (SELECT * FROM Preformer  JOIN Preformer_Songs ON id_musician = M_ID group by M_ID) AS b;\0";
 
   query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
@@ -932,7 +936,7 @@ int q9()
   std::vector<int> count;
   int64_t x;
 
-  std::string str_query = "SELECT * FROM Tracks;\0";
+  std::string str_query = "SELECT * FROM Songs;\0";
 
   query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
@@ -949,7 +953,7 @@ int q9()
     int64_t qcount = 0;
     mysqlx_row_t *row;
 
-    str_query = "select count(*) from musician_tracks where T_ID = " + std::to_string(songs[i]->getID()) + " ;";
+    str_query = "select count(*) from Preformer_Songs where T_ID = " + std::to_string(songs[i]->getID()) + " ;";
     query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
     if ((result = mysqlx_execute(query)) != NULL)
@@ -960,7 +964,7 @@ int q9()
 
         if (qcount > 1)
         {
-          str_query = "select * from musician_Tracks where T_ID = '" + std::to_string(songs[i]->getID()) + "';\0";
+          str_query = "select * from Preformer_Songs where T_ID = '" + std::to_string(songs[i]->getID()) + "';\0";
 
           query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
@@ -1001,7 +1005,7 @@ int q9()
   }
   else
   {
-    str_query = "select * from musician where ID_musician = " + std::to_string(musicians[get_max(count)]) + ";\0";
+    str_query = "select * from Preformer where ID_musician = " + std::to_string(musicians[get_max(count)]) + ";\0";
 
     query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
@@ -1038,7 +1042,7 @@ int q10()
   mysqlx_row_t *row;
   int64_t x;
 
-  std::string str_query = "SELECT * FROM Tracks;\0";
+  std::string str_query = "SELECT * FROM Songs;\0";
 
   query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
@@ -1089,7 +1093,7 @@ int q11(std::string start_Date, std::string end_Date)
   mysqlx_row_t *row;
   int64_t x;
 
-  std::string str_query = "select * from tracks where Date > '" + start_Date + "' AND Date < '" + end_Date + "';\0";
+  std::string str_query = "select * from Songs where Date > '" + start_Date + "' AND Date < '" + end_Date + "';\0";
 
   query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
@@ -1116,7 +1120,7 @@ int q11(std::string start_Date, std::string end_Date)
     }
   }
 
-  std::cout << "technician who worked on the most number of tracks :" << tech[get_max(count)] << std::endl;
+  std::cout << "technician who worked on the most number of Songs :" << tech[get_max(count)] << std::endl;
 
   mysqlx_free(result);
   mysqlx_session_close(session);
@@ -1175,7 +1179,7 @@ int q13()
   mysqlx_result_t *result;
   int64_t x;
 
-  std::string str_query = "SELECT * FROM Tracks;\0";
+  std::string str_query = "SELECT * FROM Songs;\0";
 
   query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
@@ -1193,7 +1197,7 @@ int q13()
     int64_t value = 0;
     mysqlx_row_t *row;
 
-    str_query = "select count(*) from Album_tracks where T_ID = " + std::to_string(songs[i]->getID()) + ";";
+    str_query = "select count(*) from Album_Songs where T_ID = " + std::to_string(songs[i]->getID()) + ";";
 
     query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
@@ -1250,7 +1254,7 @@ int q14()
 
   int64_t x;
 
-  std::string str_query = "SELECT * FROM Tracks;\0";
+  std::string str_query = "SELECT * FROM Songs;\0";
 
   query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
@@ -1291,7 +1295,7 @@ int q14()
       int64_t value = 0;
       mysqlx_row_t *row;
 
-      str_query = "select count(*) from tracks as a  join (select * from Album_tracks where a_ID = " + std::to_string(a[i]->getID()) + ")\
+      str_query = "select count(*) from Songs as a  join (select * from Album_Songs where a_ID = " + std::to_string(a[i]->getID()) + ")\
  as b on a.T_ID = b.T_ID where Tech = '" +
                   tech[j] + "';";
       query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
@@ -1350,7 +1354,7 @@ int q15()
   int max = -1;
   int index = -1;
 
-  std::string str_query = "SELECT * FROM musician;\0";
+  std::string str_query = "SELECT * FROM Preformer;\0";
 
   query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
@@ -1368,7 +1372,7 @@ int q15()
   {
     int64_t value;
 
-    str_query = "select count(*) from tracks as a join (select * from musician_tracks where M_ID = " + std::to_string(performers[i]->getID()) + ") as b on a.T_ID = b.T_ID group by Genre;";
+    str_query = "select count(*) from Songs as a join (select * from Preformer_Songs where M_ID = " + std::to_string(performers[i]->getID()) + ") as b on a.T_ID = b.T_ID group by Genre;";
 
     query = mysqlx_sql_new(session, str_query.c_str(), MYSQLX_NULL_TERMINATED);
 
@@ -1394,7 +1398,7 @@ int q15()
   if (index == -1 || max == -1)
     std::cout << "Query Error." << std::endl;
   else
-    std::cout << "The musician with the most diverse musical genres is :" << performers[index]->getName() << std::endl;
+    std::cout << "The Preformer with the most diverse musical genres is :" << performers[index]->getName() << std::endl;
 
   mysqlx_session_close(session);
 

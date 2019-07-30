@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     std::string start_date;
     std::string end_date;
     std::string name;
-    int choise, chack;
+    int choice, chack;
     bool fleg = true;
     if (argc < 3)
     {
@@ -31,25 +31,25 @@ int main(int argc, char *argv[])
 
     do
     {
-        std::cout << "choose the number of the question:" << std::endl;
-        std::cout << "1) how many albums recorded between the following dates" << std::endl;
-        std::cout << "2) how many track a performer recorded between the following dates" << std::endl;
-        std::cout << "3) how many albums a performer recorded between the following dates" << std::endl;
-        std::cout << "4) the most popular music instrument" << std::endl;
-        std::cout << "5) the list of music instrument in an album" << std::endl;
-        std::cout << "6) the most fruitful producer" << std::endl;
-        std::cout << "7) the most fruitful producer between the following dates" << std::endl;
-        std::cout << "8) how many performer recorded in all the years" << std::endl;
-        std::cout << "9) the performer that colobrt the most with other perf1ormers" << std::endl;
-        std::cout << "10) the most popular music genre " << std::endl;
-        std::cout << "11) who is the recording technician that recorded the most tracks in the following dates" << std::endl;
-        std::cout << "12) the first album that recorded in the studio" << std::endl;
-        std::cout << "13) list of tracks that is included in two albums or more" << std::endl;
-        std::cout << "14) the technicians the recorded an album" << std::endl;
-        std::cout << "15) the most diverse preformer" << std::endl;
-        std::cout << "16) exit" << std::endl;
-        std::cin >> choise;
-        switch (choise)
+        std::cout << "Type action number:" << std::endl;
+        std::cout << "1 Count how many albums recorded between chosen dates" << std::endl;
+        std::cout << "2 Count how many track a musician recorded between chosen dates" << std::endl;
+        std::cout << "3 Count how many albums a musician recorded between chosen dates" << std::endl;
+        std::cout << "4 The most popular instrument" << std::endl;
+        std::cout << "5 List of musical instruments in a chosen album" << std::endl;
+        std::cout << "6 The most prolific producer between chosen dates" << std::endl;
+        std::cout << "7 The most popular instrument brand" << std::endl;
+        std::cout << "8 How many musicians recorded in all time" << std::endl;
+        std::cout << "9 The Musician that collaborated the most with other musicians" << std::endl;
+        std::cout << "10 The most popular music genre " << std::endl;
+        std::cout << "11 The technician that recorded the most tracks between chosen dates" << std::endl;
+        std::cout << "12 The first album that was recorded in the studio" << std::endl;
+        std::cout << "13 List of tracks included in two albums or more" << std::endl;
+        std::cout << "14 List of technicians participating in at least one full album" << std::endl;
+        std::cout << "15 the most diverse preformer" << std::endl;
+        std::cout << "16 EXIT" << std::endl;
+        std::cin >> choice;
+        switch (choice)
         {
         case 1:
             std::cout << "Enher the the dates (yyyy-mm-dd):" << std::endl;
