@@ -1441,14 +1441,14 @@ int q13()
 
 int q14()
 {
-    session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
+  session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
                                "recording-studio", &err);
   if (NULL == session)
   {
     std::cout << mysqlx_error_message(err) << "\t" << session << std::endl;
     return -1;
   }
-  
+
   mysqlx_stmt_t *query;
   mysqlx_result_t *result;
   std::vector<std::string> tech;
@@ -1570,4 +1570,87 @@ int q14()
   mysqlx_session_close(session);
 
   return 0;
+}
+
+int q15()
+{
+  session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
+                               "recording-studio", &err);
+  if (NULL == session)
+  {
+    std::cout << mysqlx_error_message(err) << "\t" << session << std::endl;
+    return -1;
+  }
+
+  mysqlx_stmt_t *query;
+  mysqlx_result_t *result;
+  int max = -1;
+  int index = -1;
+
+  std::string qstr = "SELECT * FROM musician;\0";
+
+  query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+  if ((result = mysqlx_execute(query)) == NULL)
+
+  {
+
+    std::cout << "There was an error executing the Query" << std::endl;
+
+    return -1;
+  }
+
+  std::vector<Performer *> v = initPerformers(result);
+
+  mysqlx_row_t *row;
+
+  for (int i = 0; i < v.size(); ++i)
+
+  {
+
+    int64_t value;
+
+    qstr = "select count(*) from tracks as a join (select * from musician_tracks where M_ID = " + std::to_string(v[i]->getID()) + ") as b on a.T_ID = b.T_ID group by Genre;";
+
+    query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+    if ((result = mysqlx_execute(query)) != NULL)
+
+    {
+
+      if ((row = mysqlx_row_fetch_one(result)) != NULL)
+
+      {
+
+        mysqlx_get_sint(row, 0, &value);
+
+        if (value > max)
+
+        {
+
+          index = i;
+
+          max = value;
+        }
+      }
+
+      else
+
+      {
+
+        std::cout << "There was an error running the Query." << std::endl;
+      }
+    }
+  }
+
+  if (index == -1 || max == -1)
+
+    std::cout << "There was an error running the Query." << std::endl;
+
+  else
+
+    std::cout << "The musician with the most diverse musical genres is :" << v[index]->getName() << std::endl;
+
+  return 0;
+  mysqlx_session_close(session);
 }
