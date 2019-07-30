@@ -82,22 +82,33 @@ int main(int argc, char *argv[])
             break;
 
         case 7:
+            chack = q7();
             break;
         case 8:
+            chack = q8();
             break;
         case 9:
+            chack = q9();
             break;
         case 10:
+            chack = q10();
             break;
         case 11:
+            std::cout << "Enher the the dates (yyyy-mm-dd):" << std::endl;
+            std::cin >> start_date >> end_date;
+            chack = q11(start_date, end_date);
             break;
         case 12:
+            chack = q12();
             break;
         case 13:
+            chack = q13();
             break;
         case 14:
+            chack = q14();
             break;
         case 15:
+            chack = q15();
             break;
         case 16:
             std::cout << "goodbay" << std::endl;

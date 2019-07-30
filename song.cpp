@@ -26,9 +26,9 @@ std::vector<Song *> initSongs(mysqlx_result_t *res)
             mysqlx_get_bytes(row, 1, 0, buff1, &size);
             size = sizeof(buff2);
             mysqlx_get_bytes(row, 2, 0, buff2, &size);
-            mysqlx_get_sint(row, 3, &y);
             size = sizeof(buff3);
-            mysqlx_get_bytes(row, 4, 0, buff3, &size);
+            mysqlx_get_bytes(row, 3, 0, buff3, &size);
+            mysqlx_get_sint(row, 4, &y);
             size = sizeof(buff4);
             mysqlx_get_bytes(row, 5, 0, buff4, &size);
             size = sizeof(buff5);

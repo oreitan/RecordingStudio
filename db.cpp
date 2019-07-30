@@ -11,6 +11,52 @@ mysqlx_error_t *err;
 char username[256];
 char pass[256];
 
+int get_Index(std::vector<std::string> &v, std::string val)
+
+{
+
+  for (int i = 0; i < v.size(); ++i)
+
+    if (v[i] == val)
+
+      return i;
+
+  return -1;
+}
+
+int get_IndexI(std::vector<int> &v, int x)
+{
+  for (int i = 0; i < v.size(); ++i)
+
+    if (v[i] == x)
+
+      return i;
+
+  return -1;
+}
+
+int get_max(std::vector<int> &v)
+
+{
+
+  int index = 0;
+
+  int max = v[0];
+
+  for (int i = 1; i < v.size(); ++i)
+
+    if (v[i] > max)
+
+    {
+
+      max = v[i];
+
+      index = i;
+    }
+
+  return index;
+}
+
 int init()
 {
   session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
@@ -824,6 +870,704 @@ int q6(std::string start_Date, std::string end_Date)
     std::cout << "The most popular Producer is:\t" << v[index]->getName() << std::endl;
 
   mysqlx_free(result);
+  mysqlx_session_close(session);
+  return 0;
+}
+
+int q7()
+{
+  session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
+                               "recording-studio", &err);
+  if (NULL == session)
+  {
+    std::cout << mysqlx_error_message(err) << "\t" << session << std::endl;
+    return -1;
+  }
+
+  mysqlx_stmt_t *query;
+  mysqlx_result_t *result;
+  std::vector<std::string> manufacterers;
+  std::vector<int> count;
+  mysqlx_row_t *row;
+  int64_t x;
+
+  std::string qstr = "SELECT * FROM Inst;\0";
+
+  query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+  if ((result = mysqlx_execute(query)) == NULL)
+
+  {
+
+    std::cout << "There was an error executing the Query" << std::endl;
+
+    return -1;
+  }
+
+  std::vector<Instrument *> v = initInstruments(result);
+
+  for (int i = 0; i < v.size(); ++i)
+
+  {
+
+    qstr = "SELECT count(*) from (\
+ (SELECT * FROM musician_inst where I_ID = " +
+           std::to_string(v[i]->getID()) + ") as a join musician_tracks as b\
+ on a.M_ID = b.M_ID);";
+
+    // query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+    int value = 0;
+
+    if ((result = mysqlx_execute(query)) != NULL)
+
+    {
+
+      if ((row = mysqlx_row_fetch_one(result)) != NULL)
+
+      {
+
+        mysqlx_get_sint(row, 0, &x);
+
+        value = x;
+      }
+
+      else
+
+      {
+
+        std::cout << "There was an error running the Query." << std::endl;
+      }
+
+      if (get_Index(manufacterers, v[i]->getBrand()) == -1)
+
+      {
+
+        manufacterers.push_back(v[i]->getBrand());
+
+        count.push_back(x);
+      }
+
+      else
+
+      {
+
+        int index;
+
+        if ((index = get_Index(manufacterers, v[i]->getBrand())) != -1)
+
+          count[index] += x;
+      }
+    }
+  }
+
+  std::cout << "The most Popular Manufacterer is :" << manufacterers[get_max(count)] << std::endl;
+
+  mysqlx_free(result);
+  mysqlx_session_close(session);
+
+  return 0;
+}
+
+int q8()
+{
+  session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
+                               "recording-studio", &err);
+  if (NULL == session)
+  {
+    std::cout << mysqlx_error_message(err) << "\t" << session << std::endl;
+    return -1;
+  }
+
+  mysqlx_stmt_t *query;
+  mysqlx_result_t *result;
+
+  std::string qstr = "SELECT COUNT(*) FROM (SELECT * FROM musician  JOIN musician_tracks ON id_musician = M_ID group by M_ID) AS b;\0";
+
+  query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+  if ((result = mysqlx_execute(query)) == NULL)
+
+  {
+
+    std::cout << "There was an error executing the Query" << std::endl;
+
+    return -1;
+  }
+
+  mysqlx_row_t *row;
+
+  int64_t x;
+
+  if ((row = mysqlx_row_fetch_one(result)) != NULL)
+
+  {
+
+    mysqlx_get_sint(row, 0, &x);
+
+    std::cout << "The amount of musicians recorded throughout the years is:\t" << x << std::endl
+
+              << std::endl
+
+              << std::endl;
+  }
+
+  else
+
+  {
+
+    std::cout << "There was an error running the Query." << std::endl;
+  }
+
+  mysqlx_free(result);
+
+  return 0;
+}
+
+int q9()
+{
+  session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
+                               "recording-studio", &err);
+  if (NULL == session)
+  {
+    std::cout << mysqlx_error_message(err) << "\t" << session << std::endl;
+    return -1;
+  }
+  mysqlx_stmt_t *query;
+  mysqlx_result_t *result;
+  std::vector<int> musicians;
+  std::vector<int> count;
+  int64_t x;
+
+  std::string qstr = "SELECT * FROM Tracks;\0";
+
+  query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+  if ((result = mysqlx_execute(query)) == NULL)
+
+  {
+
+    std::cout << "There was an error executing the Query" << std::endl;
+
+    return -1;
+  }
+
+  std::vector<Song *> v = initSongs(result);
+
+  for (int i = 0; i < v.size(); ++i)
+
+  {
+
+    int64_t value = 0;
+
+    mysqlx_row_t *row;
+
+    qstr = "select count(*) from musician_tracks where T_ID = " + std::to_string(v[i]->getID()) + " ;";
+
+    query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+    if ((result = mysqlx_execute(query)) != NULL)
+
+    {
+
+      if ((row = mysqlx_row_fetch_one(result)) != NULL)
+
+      {
+
+        mysqlx_get_sint(row, 0, &value);
+
+        if (value > 1)
+
+        {
+
+          qstr = "select * from musician_Tracks where T_ID = '" + std::to_string(v[i]->getID()) + "';\0";
+
+          query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+          if ((result = mysqlx_execute(query)) != NULL)
+
+          {
+
+            do
+
+            {
+
+              while ((row = mysqlx_row_fetch_one(result)) != NULL)
+
+              {
+
+                mysqlx_get_sint(row, 0, &x);
+
+                int index;
+
+                if ((index = get_IndexI(musicians, x)) == -1)
+
+                {
+
+                  musicians.push_back(x);
+
+                  count.push_back(value - 1);
+                }
+
+                else
+
+                {
+
+                  count[index] += (value - 1);
+                }
+              }
+
+            } while (RESULT_OK == mysqlx_next_result(result));
+
+            mysqlx_result_free(result);
+          }
+        }
+      }
+
+      else
+
+      {
+
+        std::cout << "There was an error running the Query." << std::endl;
+      }
+    }
+  }
+
+  if (musicians.size() == 0)
+
+  {
+
+    std::cout << "There was an error running the Query." << std::endl;
+  }
+
+  else
+
+  {
+
+    qstr = "select * from musician where ID_musician = " + std::to_string(musicians[get_max(count)]) + ";\0";
+
+    query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+    if ((result = mysqlx_execute(query)) == NULL)
+
+    {
+
+      std::cout << "There was an error executing the Query" << std::endl;
+
+      return -1;
+    }
+
+    std::vector<Performer *> m = initPerformers(result);
+
+    std::cout << "The musician who collaborated the most is: " << m[0]->getName() << std::endl;
+  }
+
+  mysqlx_free(result);
+  mysqlx_session_close(session);
+
+  return 0;
+}
+
+int q10()
+{
+  session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
+                               "recording-studio", &err);
+  if (NULL == session)
+  {
+    std::cout << mysqlx_error_message(err) << "\t" << session << std::endl;
+    return -1;
+  }
+
+  mysqlx_stmt_t *query;
+  mysqlx_result_t *result;
+  std::vector<std::string> genre;
+  std::vector<int> count;
+  mysqlx_row_t *row;
+  int64_t x;
+
+  std::string qstr = "SELECT * FROM Tracks;\0";
+
+  query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+  if ((result = mysqlx_execute(query)) == NULL)
+
+  {
+
+    std::cout << "There was an error executing the Query" << std::endl;
+
+    return -1;
+  }
+
+  std::vector<Song *> v = initSongs(result);
+
+  for (int i = 0; i < v.size(); ++i)
+
+  {
+
+    int index;
+
+    if ((index = get_Index(genre, v[i]->getGenre())) == -1)
+
+    {
+
+      genre.push_back(v[i]->getGenre());
+
+      count.push_back(1);
+    }
+
+    else
+
+    {
+
+      count[index]++;
+    }
+  }
+
+  std::cout << "The most Popular Genre is :" << genre[get_max(count)] << std::endl;
+
+  mysqlx_free(result);
+  mysqlx_session_close(session);
+
+  return 0;
+}
+
+int q11(std::string start_Date, std::string end_Date)
+{
+  session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
+                               "recording-studio", &err);
+  if (NULL == session)
+  {
+    std::cout << mysqlx_error_message(err) << "\t" << session << std::endl;
+    return -1;
+  }
+
+  mysqlx_stmt_t *query;
+  mysqlx_result_t *result;
+  std::vector<std::string> tech;
+  std::vector<int> count;
+  mysqlx_row_t *row;
+  int64_t x;
+
+  std::string qstr = "select * from tracks where Date > '" + start_Date + "' AND Date < '" + end_Date + "';\0";
+
+  query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+  if ((result = mysqlx_execute(query)) == NULL)
+
+  {
+
+    std::cout << "There was an error executing the Query" << std::endl;
+
+    return -1;
+  }
+
+  std::vector<Song *> v = initSongs(result);
+
+  for (int i = 0; i < v.size(); ++i)
+
+  {
+
+    int index;
+
+    if ((index = get_Index(tech, v[i]->getTech())) == -1)
+
+    {
+
+      tech.push_back(v[i]->getTech());
+
+      count.push_back(1);
+    }
+
+    else
+
+    {
+
+      count[index]++;
+    }
+  }
+
+  std::cout << "technician who worked on the most number of tracks :" << tech[get_max(count)] << std::endl;
+
+  mysqlx_free(result);
+  mysqlx_session_close(session);
+
+  return 0;
+}
+
+int q12()
+{
+  session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
+                               "recording-studio", &err);
+  if (NULL == session)
+  {
+    std::cout << mysqlx_error_message(err) << "\t" << session << std::endl;
+    return -1;
+  }
+
+  mysqlx_stmt_t *query;
+  mysqlx_result_t *result;
+  std::vector<std::string> genre;
+  std::vector<int> count;
+  mysqlx_row_t *row;
+  int64_t x;
+
+  std::string qstr = "select * from Albums where End_Date = (select min(End_Date) from albums);\0";
+
+  query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+  if ((result = mysqlx_execute(query)) == NULL)
+
+  {
+
+    std::cout << "There was an error executing the Query" << std::endl;
+
+    return -1;
+  }
+
+  std::vector<Album *> v = initAlbum(result);
+
+  std::cout << "The first album is :\t" << v[0]->getName() << std::endl;
+
+  mysqlx_free(result);
+  mysqlx_session_close(session);
+
+  return 0;
+}
+
+int q13()
+{
+  session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
+                               "recording-studio", &err);
+  if (NULL == session)
+  {
+    std::cout << mysqlx_error_message(err) << "\t" << session << std::endl;
+    return -1;
+  }
+
+  mysqlx_stmt_t *query;
+  mysqlx_result_t *result;
+  int64_t x;
+
+  std::string qstr = "SELECT * FROM Tracks;\0";
+
+  query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+  if ((result = mysqlx_execute(query)) == NULL)
+
+  {
+
+    std::cout << "There was an error executing the Query" << std::endl;
+
+    return -1;
+  }
+
+  std::vector<Song *> v = initSongs(result);
+
+  std::vector<Song *> choosen;
+
+  for (int i = 0; i < v.size(); ++i)
+
+  {
+
+    int64_t value = 0;
+
+    mysqlx_row_t *row;
+
+    qstr = "select count(*) from Album_tracks where T_ID = " + std::to_string(v[i]->getID()) + ";";
+
+    query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+    if ((result = mysqlx_execute(query)) != NULL)
+
+    {
+
+      if ((row = mysqlx_row_fetch_one(result)) != NULL)
+
+      {
+
+        mysqlx_get_sint(row, 0, &value);
+
+        if (value > 1)
+
+        {
+
+          choosen.push_back(v[i]);
+        }
+      }
+
+      else
+
+      {
+
+        std::cout << "There was an error running the Query." << std::endl;
+      }
+    }
+  }
+
+  if (choosen.size() == 0)
+
+  {
+
+    std::cout << "There was an error running the Query." << std::endl;
+  }
+
+  else
+
+  {
+
+    std::cout << "The tracks that were in two or more albums :" << std::endl
+
+              << std::endl;
+
+    std::cout << "index\tID, Name, Music_Compuser, Length, Lyrics_Composer, Date, Genre, Technician" << std::endl;
+
+    std::cout << "-----------------------------------------------------------------------------" << std::endl;
+
+    for (int i = 0; i < choosen.size(); ++i)
+
+    {
+
+      std::cout << i << "\t" << *choosen[i] << std::endl;
+    }
+
+    std::cout << std::endl;
+  }
+
+  mysqlx_free(result);
+  mysqlx_session_close(session);
+
+  return 0;
+}
+
+int q14()
+{
+    session = mysqlx_get_session("localhost", DEFAULT_MYSQLX_PORT, username, pass,
+                               "recording-studio", &err);
+  if (NULL == session)
+  {
+    std::cout << mysqlx_error_message(err) << "\t" << session << std::endl;
+    return -1;
+  }
+  
+  mysqlx_stmt_t *query;
+  mysqlx_result_t *result;
+  std::vector<std::string> tech;
+  std::vector<std::string> choosen;
+
+  int64_t x;
+
+  std::string qstr = "SELECT * FROM Tracks;\0";
+
+  query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+  if ((result = mysqlx_execute(query)) == NULL)
+
+  {
+
+    std::cout << "There was an error executing the Query" << std::endl;
+
+    return -1;
+  }
+
+  std::vector<Song *> v = initSongs(result);
+
+  for (int i = 0; i < v.size(); ++i)
+
+  {
+
+    if (get_Index(tech, v[i]->getTech()) == -1)
+
+    {
+
+      tech.push_back(v[i]->getTech());
+    }
+  }
+
+  qstr = "SELECT * FROM Albums;\0";
+
+  query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+  if ((result = mysqlx_execute(query)) == NULL)
+
+  {
+
+    std::cout << "There was an error executing the Query" << std::endl;
+
+    return -1;
+  }
+
+  std::vector<Album *> a = initAlbum(result);
+
+  for (int i = 0; i < a.size(); ++i)
+
+  {
+
+    int albumLength = a[i]->getTracks();
+
+    for (int j = 0; j < tech.size(); ++j)
+
+    {
+
+      int64_t value = 0;
+      mysqlx_row_t *row;
+
+      qstr = "select count(*) from tracks as a  join (select * from Album_tracks where a_ID = " + std::to_string(a[i]->getID()) + ")\
+ as b on a.T_ID = b.T_ID where Tech = '" +
+             tech[j] + "';";
+
+      query = mysqlx_sql_new(session, qstr.c_str(), MYSQLX_NULL_TERMINATED);
+
+      if ((result = mysqlx_execute(query)) != NULL)
+
+      {
+
+        if ((row = mysqlx_row_fetch_one(result)) != NULL)
+
+        {
+
+          mysqlx_get_sint(row, 0, &value);
+
+          if (value == albumLength)
+
+          {
+
+            if (get_Index(choosen, tech[j]) == -1)
+
+            {
+
+              choosen.push_back(tech[j]);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (choosen.size() == 0)
+
+  {
+
+    std::cout << "There was an error running the Query." << std::endl;
+  }
+
+  else
+
+  {
+
+    std::cout << "The technicians that worked on complete albums are :" << std::endl;
+
+    for (int i = 0; i < choosen.size(); ++i)
+
+    {
+
+      std::cout << choosen[i] << std::endl;
+    }
+
+    std::cout << std::endl;
+  }
+
+  mysqlx_free(result);
+  mysqlx_session_close(session);
 
   return 0;
 }
