@@ -28,5 +28,5 @@ private:
     int tracks;
 };
 
-std::vector<Album *> initAlbum(mysqlx_result_t *res);
+std::vector<Album *> initAlbums(mysqlx_result_t *res);
 std::ostream &operator<<(std::ostream &os, const Album &ob);

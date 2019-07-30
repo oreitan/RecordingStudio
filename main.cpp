@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         std::cout << "13) list of tracks that is included in two albums or more" << std::endl;
         std::cout << "14) the technicians the recorded an album" << std::endl;
         std::cout << "15) the most diverse preformer" << std::endl;
-        std::cout << "15) exit" << std::endl;
+        std::cout << "16) exit" << std::endl;
         std::cin >> choise;
         switch (choise)
         {
@@ -59,12 +59,16 @@ int main(int argc, char *argv[])
         case 2:
             std::cout << "enther preformer name:" << std::endl;
             std::cin >> name;
-            chack = q2(name);
+            std::cout << "Please input the start and end date (YEAR-MONTH-DAY)" << std::endl;
+            std::cin >> start_date >> end_date;
+            chack = q2(name, start_date, end_date);
             break;
         case 3:
             std::cout << "enther preformer name:" << std::endl;
             std::cin >> name;
-            chack = q3(name);
+            std::cout << "Please input the start and end date (YEAR-MONTH-DAY)" << std::endl;
+            std::cin >> start_date >> end_date;
+            chack = q3(name,start_date,end_date);
             break;
         case 4:
             chack = q4();

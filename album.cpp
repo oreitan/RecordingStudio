@@ -1,6 +1,6 @@
 #include "album.hpp"
 
-std::vector<Album *> initAlbum(mysqlx_result_t *res)
+std::vector<Album *> initAlbums(mysqlx_result_t *res)
 {
     std::vector<Album *> v;
 
